@@ -17,3 +17,5 @@ crudops/.vs
 crudops/packages
 crudops/api/bin
 crudops/api/obj
+packages
+.vs
