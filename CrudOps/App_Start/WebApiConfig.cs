@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CrudOps.App_Start;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ namespace CrudOps
 
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
 
+            AutomapperConfig.Config();
         }
     }
 }
