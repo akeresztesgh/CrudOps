@@ -15,7 +15,7 @@ web/index.html
 *.orig
 crudops/.vs
 crudops/packages
-crudops/api/bin
-crudops/api/obj
+crudops/bin
+crudops/obj
 packages
 .vs

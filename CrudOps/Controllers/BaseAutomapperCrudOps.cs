@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using CrudOps.Models;
+using CrudOps.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Linq.Dynamic;
 
 namespace CrudOps.Controllers
 {
@@ -14,6 +16,51 @@ namespace CrudOps.Controllers
         where TViewModel : class, IBaseModel
     {
         private readonly AppDbContext _db = new AppDbContext();
+
+        [Route("getpage"), HttpGet]
+
+        public IHttpActionResult GetPage([FromUri]PaginationRequest options)
+        {
+            if (options == null)
+                return BadRequest("Options can not be null");
+
+            var set = _db.Set<TModel>();
+
+            IQueryable<TModel> query;
+            if (string.IsNullOrWhiteSpace(options.SortColumn))
+            {
+                query = set.OrderBy(i => i.Id);
+            }
+            else
+            {
+                var orderByStr = $"{options.SortColumn} {(options.SortDescending ? "DESC" : "ASC")}";
+                query = set.OrderBy(orderByStr);
+            }
+
+            if (!string.IsNullOrWhiteSpace(options.SearchString))
+            {
+                query = SearchPages(query, options.SearchString);
+            }
+
+            var items = query.Skip(options.StartRow)
+                .Take(options.EndRow - options.StartRow)
+                .ToArray()
+                .Select(i => Mapper.Map<TViewModel>(i))
+                .ToArray();
+
+            return Ok(new
+            {
+                Total = query.Count(),
+                Data = items
+            });
+
+        }
+
+        protected virtual IQueryable<TModel> SearchPages(IQueryable<TModel> query, string searchString)
+        {
+            return query;
+        }
+
 
         [Route(""), HttpGet]
         public IHttpActionResult Get()
